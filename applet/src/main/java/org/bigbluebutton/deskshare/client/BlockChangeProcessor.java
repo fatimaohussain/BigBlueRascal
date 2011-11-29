@@ -47,12 +47,12 @@ public class BlockChangeProcessor {
 	}
 
         public void blockSent(int position) {
-		blockManager.blockSent(position);
+		//blockManager.blockSent(position);
 	}
 
-	public EncodedBlockData getBlockToSend(int position) {
-		return blockManager.getBlock(position).encode();
-	}
+//	public EncodedBlockData getBlockToSend(int position) {
+//		return blockManager.getBlock(position).encode();
+//	}
 
 	public Message getNextMessageToSend() throws InterruptedException {
 		try {

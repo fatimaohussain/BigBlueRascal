@@ -68,13 +68,8 @@ public class BlockManager {
 
         } catch (Exception e) {
             //e.printStackTrace();
-            System.err.println("FatiledToOpenFile: "
-                        + e.getMessage());
-
-
+            System.err.println("FatiledToOpenFile: " + e.getMessage());
         }
-
-
         
         numColumns = factory.getColumnCount();
         numRows = factory.getRowCount();
@@ -84,69 +79,33 @@ public class BlockManager {
         	Block block = factory.createBlock(position);
         	blocksMap.put(new Integer(position), block);
         }
-
-
     }
     
     public void processCapturedScreen(BufferedImage capturedScreen) {    	
     	long start = System.currentTimeMillis();
-
-    	Vector<Integer> changedBlocks = new Vector<Integer>();
-/*		
-		int numberOfBlocks = numColumPBlockManagerns * numRows;
-		for (int position = 1; position <= numberOfBlocks; position++) {
-			Block block = blocksMap.get(new Integer(position));
-        	if (block.hasChanged(capturedScreen)) {
-        		changedBlocks.add(new Integer(position));        		
-        	}
-		}  
-    	
-		if (changedBlocks.size() > 0) {
-			Integer[] bc = new Integer[changedBlocks.size()];
-			System.arraycopy(changedBlocks.toArray(), 0, bc, 0, bc.length);
-			changedBlocks.clear();
-			notifyChangedBlockListener(new BlockMessage(bc));
-		}
-*/
-		
+		        
 		int numberOfBlocks = numColumns * numRows;
 		for (int position = 1; position <= numberOfBlocks; position++) {
-                    Block block = blocksMap.get(new Integer(position));
-                    if (block.hasChanged(capturedScreen)) {
-                            changedBlocks.add(new Integer(position));        		
-                    }
-        	
-                    if ((position % numColumns == 0) && (changedBlocks.size() > 0)) {
-                            Integer[] bc = new Integer[changedBlocks.size()];
-                            System.arraycopy(changedBlocks.toArray(), 0, bc, 0, bc.length);
-                            changedBlocks.clear();
-                            notifyBlockChange(bc);
-                            notifyChangedBlockListener(new BlockMessage(bc));
-                    }
+			Block block = blocksMap.get(new Integer(position));
+			block.processBlock(capturedScreen);
 		}
-
+		System.out.println("Creating frame");
+		saveFrameToFile();
     }
 
 
-    private void notifyBlockChange(Integer[] bc) {
-    	//listeners.onChangedBlock(position);
-       ByteArrayOutputStream screenVideoFrame = generateFrame(bc,false);
-
+    private void saveFrameToFile() {
+    	ByteArrayOutputStream screenVideoFrame = generateFrame(true);
+      
        try {
-            fileCapture.record(screenVideoFrame, false);
-
+            fileCapture.record(screenVideoFrame, true);
         } catch (Exception e) {
-            //e.printStackTrace();
-            System.err.println("FatiledToEncode: "
-                        + e.getMessage());
-
-
+            e.printStackTrace();
+           // System.err.println("FatiledToEncode: " + e.getMessage());
         }
-
     }
 
-    //byte [] generateFrame(Integer[] bc, boolean genKeyFrame) {
-    ByteArrayOutputStream generateFrame(Integer[] bc, boolean genKeyFrame){
+    private ByteArrayOutputStream generateFrame(boolean genKeyFrame){
             ByteArrayOutputStream screenVideoFrame = new ByteArrayOutputStream();
 
             byte [] encodedDim = ScreenVideoEncoder.encodeBlockAndScreenDimensions(blockDim.getWidth(), screenDim.getWidth(), blockDim.getHeight(), screenDim.getHeight());
@@ -160,13 +119,10 @@ public class BlockManager {
             } catch (Exception e) {
                 System.out.println("An IO exception occured");
             }
+            
             for (int pos = 1; pos < numberOfBlocks; pos++) {
                 Block block = blocksMap.get(pos);
-                byte [] encodedBlock = ScreenVideoEncoder.encodeBlockUnchanged();
-                //Have to write code for keyFrame every 40th frames
-               // if (block.hasChanged || genKeyFrame) {
-                    //encodedBlock = block.getEncodedBlock();
-                //}
+                byte [] encodedBlock = block.encode(genKeyFrame);
                 screenVideoFrame.write(encodedBlock, 0, encodedBlock.length);
             }
 
@@ -187,12 +143,7 @@ public class BlockManager {
 	public void removeListener(ChangedBlocksListener listener) {
 		listeners = null;
 	}
-    
-	public void blockSent(int position) {
-		Block block = (Block) blocksMap.get(new Integer(position));
-		block.sent();
-	}
-	
+    	
 	public Block getBlock(int position) {
 		return (Block) blocksMap.get(new Integer(position));
 	}

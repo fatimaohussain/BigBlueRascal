@@ -25,7 +25,6 @@ import org.bigbluebutton.deskshare.client.blocks.BlockManager;
 import org.bigbluebutton.deskshare.client.blocks.ChangedBlocksListener;
 import org.bigbluebutton.deskshare.client.net.ConnectionException;
 import org.bigbluebutton.deskshare.client.net.NetworkConnectionListener;
-import org.bigbluebutton.deskshare.client.net.NetworkStreamSender;
 import org.bigbluebutton.deskshare.common.Dimension;
 
 public class ScreenSharerRunner {
@@ -59,8 +58,7 @@ public class ScreenSharerRunner {
 		Dimension tileDim = new Dimension(blockWidth, blockHeight);
 		blockManager = new BlockManager();		
 		blockManager.initialize(screenDim, tileDim);
-
-                blockChangeProcessor = new BlockChangeProcessor(blockManager, screenDim, tileDim);
+        blockChangeProcessor = new BlockChangeProcessor(blockManager, screenDim, tileDim);
 		
 		//-sender = new NetworkStreamSender(blockManager, ssi.host, ssi.port, ssi.room, screenDim, tileDim, ssi.httpTunnel);
                 //sender = new NetworkStreamSender(blockManager, screenDim, tileDim);
@@ -70,7 +68,7 @@ public class ScreenSharerRunner {
 		printHeader();
 		
 		//connected = sender.connect();
-                connected = true;
+        connected = true;
 		if (connected) {
 			//ChangedBlocksListener changedBlocksListener = new ChangedBlockListenerImp(sender);
                     //The listeners and blockChangeProcessor is not used anywhere in my code.

@@ -48,56 +48,37 @@ public final class Block {
         this.location = location;
     }
     
-    public boolean hasChanged(BufferedImage capturedScreen) {	 
+    public void processBlock(BufferedImage capturedScreen) {	 
+    	
     	synchronized(pixelsLock) {
             try {
             	capturedPixels = ScreenVideoEncoder.getPixels(capturedScreen, getX(), getY(), getWidth(), getHeight());
+            	int[] pixelsCopy = new int[capturedPixels.length];
+            	
+            	synchronized (pixelsLock) {     		
+                    System.arraycopy(capturedPixels, 0, pixelsCopy, 0, capturedPixels.length);
+        		}           	            	                
             } catch (PixelExtractException e) {
             	System.out.println(e.toString());
         	}  
-            
-            if (! dirtyBlock.get()) {
-                if ((! checksumSame(capturedPixels)) || sendKeepAliveBlock()) {
-                	dirtyBlock.set(true);
-                	return true;
-                }            	
-            } 
     	}
-    	 		    	
-        return false;
     }
-         
-    private boolean isKeepAliveBlock() {
-    	// Use block 1 as our keepalive block. The keepalive block is our audit so that the server knows
-    	// that the applet is still connected to the server. So it there's no change in the desktop, the applet
-    	// should still send this keepalive block.
-    	return position == 1;
-    }
-    
-    private boolean sendKeepAliveBlock() {
-    	long now = System.currentTimeMillis();
-    	if (isKeepAliveBlock() && (now - lastSent > 30000)) {
-    		// Send keepalive block every 30 seconds.
-    		lastSent = now;
-    		System.out.println("Sending keep alive block!");
-    		return true;
-    	}
-    	return false;
-    }
-    
-    public void sent() {
-    	dirtyBlock.set(false);
-    }
-    
-    public EncodedBlockData encode() {   
+       
+    public byte[] encode(boolean keyFrame) {   
     	int[] pixelsCopy = new int[capturedPixels.length];
     	
     	synchronized (pixelsLock) {     		
             System.arraycopy(capturedPixels, 0, pixelsCopy, 0, capturedPixels.length);
 		}
     	
-        byte[] encodedBlock = ScreenVideoEncoder.encodePixels(pixelsCopy, getWidth(), getHeight()); 	
-        return new EncodedBlockData(position, encodedBlock);		
+    	byte [] encodedBlock;
+    	if (checksumSame(capturedPixels) || keyFrame) {
+    		encodedBlock = ScreenVideoEncoder.encodePixels(pixelsCopy, getWidth(), getHeight()); 
+    	} else {
+    		encodedBlock = ScreenVideoEncoder.encodeBlockUnchanged();
+    	}
+        	     	
+        return encodedBlock;
     }
     
     private boolean checksumSame(int[] pixels) {

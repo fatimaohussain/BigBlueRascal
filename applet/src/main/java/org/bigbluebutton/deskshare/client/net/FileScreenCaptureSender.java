@@ -38,8 +38,7 @@ public class FileScreenCaptureSender implements ScreenCaptureSender {
 	
 	public void connect(String host, String room, int width, int height) throws ConnectionException {
     	try {
-			fo = new FileOutputStream("D://temp/"+"ScreenVideo.flv");
-			
+			fo = new FileOutputStream("D://temp/"+"ScreenVideo.flv");			
 			fo.write(svf.encodeHeader());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -50,8 +49,7 @@ public class FileScreenCaptureSender implements ScreenCaptureSender {
         public void init() throws ConnectionException {
     	try {
 			//fo = new FileOutputStream(new File ("C://blueRascal/"+"ScreenVideo.flv"));
-                        fo = new FileOutputStream("C://blueRascal/"+"ScreenVideo.flv");
-
+    		fo = new FileOutputStream("D://temp/" + "ScreenVideo.flv");
 			fo.write(svf.encodeHeader());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -82,7 +80,7 @@ public class FileScreenCaptureSender implements ScreenCaptureSender {
 		}
 	}
 
-        public void record(ByteArrayOutputStream videoData, boolean isKeyFrame) throws ConnectionException {
+	public void record(ByteArrayOutputStream videoData, boolean isKeyFrame) throws ConnectionException {
 		try {
 			fo.write(svf.encodeFlvData(videoData));
 		} catch (IOException e) {

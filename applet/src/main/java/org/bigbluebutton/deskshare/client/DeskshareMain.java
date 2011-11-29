@@ -38,7 +38,6 @@ public class DeskshareMain implements ClientListener, LifeLineListener {
 	
 	private List<String> optionHelpStrings = new ArrayList<String>();
 	private static DeskshareMain dsMain;
-	private static LifeLine lifeline;
 	private static DeskshareClient client;
 	
 	private Option addHelp(Option option, String helpString) {
@@ -113,9 +112,6 @@ public class DeskshareMain implements ClientListener, LifeLineListener {
         
         Image image = Toolkit.getDefaultToolkit().getImage(iconValue);
         
-        //lifeline = new LifeLine(listenPortValue.intValue(), dsMain);
-        lifeline = new LifeLine( dsMain);
-        lifeline.listen();
 
         /*
         client = new DeskshareClient.NewBuilder().host(hostValue).port(portValue)
@@ -140,7 +136,6 @@ public class DeskshareMain implements ClientListener, LifeLineListener {
 			ExitCode reason = dsMain.exitReasonQ.take();
 			System.out.println("Stopping client.");
 			client.stop();
-			lifeline.disconnect();
 			System.exit(reason.getExitCode());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -168,7 +163,6 @@ public class DeskshareMain implements ClientListener, LifeLineListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			client.stop();
-			lifeline.disconnect();
 			System.exit(reason.getExitCode());
 		}
 	}
