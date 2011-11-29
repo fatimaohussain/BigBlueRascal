@@ -49,7 +49,7 @@ public class FileScreenCaptureSender implements ScreenCaptureSender {
         public void init() throws ConnectionException {
     	try {
 			//fo = new FileOutputStream(new File ("C://blueRascal/"+"ScreenVideo.flv"));
-    		fo = new FileOutputStream("D://temp/" + "ScreenVideo.flv");
+    		fo = new FileOutputStream("D://temp/" + "ScreenVideo1.flv");
 			fo.write(svf.encodeHeader());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -80,9 +80,10 @@ public class FileScreenCaptureSender implements ScreenCaptureSender {
 		}
 	}
 
-	public void record(ByteArrayOutputStream videoData, boolean isKeyFrame) throws ConnectionException {
+	public void record(ByteArrayOutputStream videoData) throws ConnectionException {
 		try {
 			fo.write(svf.encodeFlvData(videoData));
+			fo.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ConnectionException("Fail to write to file.");

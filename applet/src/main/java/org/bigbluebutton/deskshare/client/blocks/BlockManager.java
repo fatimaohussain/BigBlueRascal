@@ -48,7 +48,8 @@ public class BlockManager {
     private ChangedBlocksListener listeners;
     //private PBlockManager blockProcessor;
     private Dimension screenDim, blockDim;
-
+    private int frameCount = 0;
+    
     private FileScreenCaptureSender fileCapture;
     
     public BlockManager() {
@@ -95,10 +96,16 @@ public class BlockManager {
 
 
     private void saveFrameToFile() {
-    	ByteArrayOutputStream screenVideoFrame = generateFrame(true);
+    	boolean keyFrame = false;
+    	if (frameCount % 25 == 0) {
+    		keyFrame = true;
+    		frameCount = 0;
+    	}
+    	frameCount ++;
+    	ByteArrayOutputStream screenVideoFrame = generateFrame(keyFrame);
       
        try {
-            fileCapture.record(screenVideoFrame, true);
+            fileCapture.record(screenVideoFrame);
         } catch (Exception e) {
             e.printStackTrace();
            // System.err.println("FatiledToEncode: " + e.getMessage());
@@ -106,29 +113,27 @@ public class BlockManager {
     }
 
     private ByteArrayOutputStream generateFrame(boolean genKeyFrame){
-            ByteArrayOutputStream screenVideoFrame = new ByteArrayOutputStream();
+    	ByteArrayOutputStream screenVideoFrame = new ByteArrayOutputStream();
+    	byte [] encodedDim = ScreenVideoEncoder.encodeBlockAndScreenDimensions(blockDim.getWidth(), screenDim.getWidth(), blockDim.getHeight(), screenDim.getHeight());
 
-            byte [] encodedDim = ScreenVideoEncoder.encodeBlockAndScreenDimensions(blockDim.getWidth(), screenDim.getWidth(), blockDim.getHeight(), screenDim.getHeight());
+    	byte videoDataHeader = ScreenVideoEncoder.encodeFlvVideoDataHeader(genKeyFrame);
 
-            int numberOfBlocks = numRows * numColumns;
-            byte videoDataHeader = ScreenVideoEncoder.encodeFlvVideoDataHeader(genKeyFrame);
+    	screenVideoFrame.write(videoDataHeader);
+    	try {
+    		screenVideoFrame.write(encodedDim);
+    	} catch (Exception e) {
+    		System.out.println("An IO exception occured");
+    	}
+        
+    	int numberOfBlocks = numRows * numColumns;
+    	for (int pos = 1; pos < numberOfBlocks; pos++) {
+    		Block block = blocksMap.get(pos);
+    		byte [] encodedBlock = block.encode(genKeyFrame);
+    		screenVideoFrame.write(encodedBlock, 0, encodedBlock.length);
+    	}
 
-            screenVideoFrame.write(videoDataHeader);
-            try {
-                screenVideoFrame.write(encodedDim);
-            } catch (Exception e) {
-                System.out.println("An IO exception occured");
-            }
-            
-            for (int pos = 1; pos < numberOfBlocks; pos++) {
-                Block block = blocksMap.get(pos);
-                byte [] encodedBlock = block.encode(genKeyFrame);
-                screenVideoFrame.write(encodedBlock, 0, encodedBlock.length);
-            }
-
-            //return screenVideoFrame.toByteArray();
-            return screenVideoFrame;
-        }
+    	return screenVideoFrame;
+	}
 
 
     private void notifyChangedBlockListener(BlockMessage position) {

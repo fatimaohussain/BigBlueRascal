@@ -48,16 +48,10 @@ public final class Block {
         this.location = location;
     }
     
-    public void processBlock(BufferedImage capturedScreen) {	 
-    	
+    public void processBlock(BufferedImage capturedScreen) {	     	
     	synchronized(pixelsLock) {
             try {
-            	capturedPixels = ScreenVideoEncoder.getPixels(capturedScreen, getX(), getY(), getWidth(), getHeight());
-            	int[] pixelsCopy = new int[capturedPixels.length];
-            	
-            	synchronized (pixelsLock) {     		
-                    System.arraycopy(capturedPixels, 0, pixelsCopy, 0, capturedPixels.length);
-        		}           	            	                
+            	capturedPixels = ScreenVideoEncoder.getPixels(capturedScreen, getX(), getY(), getWidth(), getHeight());         	            	                
             } catch (PixelExtractException e) {
             	System.out.println(e.toString());
         	}  
@@ -72,9 +66,11 @@ public final class Block {
 		}
     	
     	byte [] encodedBlock;
-    	if (checksumSame(capturedPixels) || keyFrame) {
+    	if (! checksumSame(capturedPixels) || keyFrame) {
+    		System.out.println("Pixels changed ." + position + " keyframe " + keyFrame);
     		encodedBlock = ScreenVideoEncoder.encodePixels(pixelsCopy, getWidth(), getHeight()); 
     	} else {
+    		System.out.println("Pixels unchanged ." + position + " keyframe " + keyFrame);
     		encodedBlock = ScreenVideoEncoder.encodeBlockUnchanged();
     	}
         	     	
