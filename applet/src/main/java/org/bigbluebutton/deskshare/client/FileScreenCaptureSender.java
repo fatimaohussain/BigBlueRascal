@@ -17,17 +17,16 @@
 * with BigBlueButton; if not, see <http://www.gnu.org/licenses/>.
 * 
 **/
-package org.bigbluebutton.deskshare.client.net;
+package org.bigbluebutton.deskshare.client;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.File;
-
 import org.bigbluebutton.deskshare.client.encoder.FlvEncodeException;
 import org.bigbluebutton.deskshare.client.encoder.ScreenVideoFlvEncoder;
 
-public class FileScreenCaptureSender implements ScreenCaptureSender {
+
+public class FileScreenCaptureSender {
 
 	private FileOutputStream fo;
 	private ScreenVideoFlvEncoder svf ;
@@ -36,61 +35,34 @@ public class FileScreenCaptureSender implements ScreenCaptureSender {
             svf = new ScreenVideoFlvEncoder();
         }
 	
-	public void connect(String host, String room, int width, int height) throws ConnectionException {
-    	try {
-			fo = new FileOutputStream("D://temp/"+"ScreenVideo.flv");			
-			fo.write(svf.encodeHeader());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new ConnectionException("Failed to open file.");
-		}
-	}
-
-        public void init() throws ConnectionException {
+        public void init() {
     	try {
 			//fo = new FileOutputStream(new File ("C://blueRascal/"+"ScreenVideo.flv"));
-    		fo = new FileOutputStream("D://temp/" + "ScreenVideo1.flv");
+    		fo = new FileOutputStream("D://temp/" + "ScreenVideo2.flv");
 			fo.write(svf.encodeHeader());
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new ConnectionException("Failed to open file.");
 		}
 	}
 
 
-	public void disconnect() throws ConnectionException {
+	public void disconnect()  {
     	try {
     		System.out.println("Closing stream");
 			fo.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new ConnectionException("Fail to clode file.");
 		}
 	}
 
-	public void send(ByteArrayOutputStream videoData, boolean isKeyFrame) throws ConnectionException {
-		try {
-			fo.write(svf.encodeFlvData(videoData));
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new ConnectionException("Fail to write to file.");
-		} catch (FlvEncodeException e) {
-			e.printStackTrace();
-			throw new ConnectionException("Fail to encode FLV.");
-		}
-	}
-
-	public void record(ByteArrayOutputStream videoData) throws ConnectionException {
+	public void record(ByteArrayOutputStream videoData) {
 		try {
 			fo.write(svf.encodeFlvData(videoData));
 			fo.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new ConnectionException("Fail to write to file.");
 		} catch (FlvEncodeException e) {
 			e.printStackTrace();
-			throw new ConnectionException("Fail to encode FLV.");
 		}
 	}
-
 }

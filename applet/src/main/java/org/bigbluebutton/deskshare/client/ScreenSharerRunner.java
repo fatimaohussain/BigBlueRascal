@@ -22,9 +22,6 @@
 package org.bigbluebutton.deskshare.client;
 
 import org.bigbluebutton.deskshare.client.blocks.BlockManager;
-import org.bigbluebutton.deskshare.client.blocks.ChangedBlocksListener;
-import org.bigbluebutton.deskshare.client.net.ConnectionException;
-import org.bigbluebutton.deskshare.client.net.NetworkConnectionListener;
 import org.bigbluebutton.deskshare.common.Dimension;
 
 public class ScreenSharerRunner {
@@ -36,20 +33,15 @@ public class ScreenSharerRunner {
 	private int blockHeight = 64;	
 	boolean connected = false;
 	private boolean started = false;
-	//private NetworkStreamSender sender;
-        private BlockChangeProcessor blockChangeProcessor;
-	
+
 	private final ScreenShareInfo ssi;
 	
 	private DeskshareSystemTray tray = new DeskshareSystemTray();
 	private ClientListener listener;
-	private MouseLocationTaker mouseLocTaker;
-	
+
 	public ScreenSharerRunner(ScreenShareInfo ssi) {
 		this.ssi = ssi;
-		captureTaker = new ScreenCaptureTaker(ssi.x, ssi.y, ssi.captureWidth, ssi.captureHeight, ssi.scaleWidth, 
-				ssi.scaleHeight, ssi.quality);
-		mouseLocTaker = new MouseLocationTaker(ssi.captureWidth, ssi.captureHeight, ssi.scaleWidth, ssi.scaleHeight, ssi.x, ssi.y);
+		captureTaker = new ScreenCaptureTaker(ssi.x, ssi.y, ssi.captureWidth, ssi.captureHeight, ssi.scaleWidth, ssi.scaleHeight, ssi.quality);
 		
 		// Use the scaleWidth and scaleHeight as the dimension we pass to the BlockManager.
 		// If there is no scaling required, the scaleWidth and scaleHeight will be the same as 
@@ -58,34 +50,14 @@ public class ScreenSharerRunner {
 		Dimension tileDim = new Dimension(blockWidth, blockHeight);
 		blockManager = new BlockManager();		
 		blockManager.initialize(screenDim, tileDim);
-        blockChangeProcessor = new BlockChangeProcessor(blockManager, screenDim, tileDim);
-		
-		//-sender = new NetworkStreamSender(blockManager, ssi.host, ssi.port, ssi.room, screenDim, tileDim, ssi.httpTunnel);
-                //sender = new NetworkStreamSender(blockManager, screenDim, tileDim);
 	}
 	
 	public void startSharing() {	
 		printHeader();
-		
-		//connected = sender.connect();
-        connected = true;
-		if (connected) {
-			//ChangedBlocksListener changedBlocksListener = new ChangedBlockListenerImp(sender);
-                    //The listeners and blockChangeProcessor is not used anywhere in my code.
-                    ChangedBlocksListener changedBlocksListener = new ChangedBlockListenerImp(blockChangeProcessor);
-			blockManager.addListener(changedBlocksListener);
 			ScreenCaptureListener screenCapListener = new ScreenCaptureListenerImp(blockManager);
 			captureTaker.addListener(screenCapListener);
-			captureTaker.start();			
-			//sender.start();
-			//MouseLocationListenerImp mouseLocListener = new MouseLocationListenerImp(sender, ssi.room);
-                        MouseLocationListenerImp mouseLocListener = new MouseLocationListenerImp(blockChangeProcessor);
-			mouseLocTaker.addListener(mouseLocListener);
-			mouseLocTaker.start();			
+			captureTaker.start();						
 			started = true;
-		} else {
-			notifyListener(ExitCode.DESKSHARE_SERVICE_UNAVAILABLE);
-		}
 	}
 	
 	/*****************************************************************************
@@ -115,7 +87,6 @@ public class ScreenSharerRunner {
 		System.out.println(NAME + "Change system tray icon message");
 		tray.disconnectIconSystemTrayMessage();
 		captureTaker.stop();
-		mouseLocTaker.stop();
 	} // END FUNCTION disconnectSharing
 	
 	public void stopSharing() {
@@ -123,7 +94,6 @@ public class ScreenSharerRunner {
 		System.out.println(NAME + "Removing icon from system tray.");
 		tray.removeIconFromSystemTray();
 		captureTaker.stop();
-		mouseLocTaker.stop();
 		if (connected && started) {
 			//try {
 				//sender.stop();
@@ -137,7 +107,6 @@ public class ScreenSharerRunner {
 
 	public void setCaptureCoordinates(int x, int y) {
 		captureTaker.setCaptureCoordinates(x, y);
-		mouseLocTaker.setCaptureCoordinates(x, y);
 	}
 	
 	private void notifyListener(ExitCode reason) {

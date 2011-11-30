@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Vector;
 //import org.bigbluebutton.deskshare.processor.PBlockManager;
 
-import org.bigbluebutton.deskshare.client.net.BlockMessage;
+import org.bigbluebutton.deskshare.client.FileScreenCaptureSender;
 import org.bigbluebutton.deskshare.common.Dimension;
 
 import java.io.ByteArrayOutputStream;
@@ -37,7 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 //import org.bigbluebutton.deskshare.common.ScreenVideoEncoder;
 import org.bigbluebutton.deskshare.common.ScreenVideoEncoder;
 import org.bigbluebutton.deskshare.common.Dimension;
-import org.bigbluebutton.deskshare.client.net.FileScreenCaptureSender;
 
 public class BlockManager {
     private final Map<Integer, Block> blocksMap;
@@ -45,7 +44,6 @@ public class BlockManager {
     private int numRows;
     
     private BlockFactory factory;
-    private ChangedBlocksListener listeners;
     //private PBlockManager blockProcessor;
     private Dimension screenDim, blockDim;
     private int frameCount = 0;
@@ -135,20 +133,7 @@ public class BlockManager {
     	return screenVideoFrame;
 	}
 
-
-    private void notifyChangedBlockListener(BlockMessage position) {
-    	listeners.onChangedBlock(position);
-    }
-    
-
-	public void addListener(ChangedBlocksListener listener) {
-		listeners = listener;
-	}
-
-	public void removeListener(ChangedBlocksListener listener) {
-		listeners = null;
-	}
-    	
+   	
 	public Block getBlock(int position) {
 		return (Block) blocksMap.get(new Integer(position));
 	}

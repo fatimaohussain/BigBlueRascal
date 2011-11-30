@@ -25,7 +25,6 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bigbluebutton.deskshare.client.net.EncodedBlockData;
 import org.bigbluebutton.deskshare.common.PixelExtractException;
 import org.bigbluebutton.deskshare.common.ScreenVideoEncoder;
 import org.bigbluebutton.deskshare.common.Dimension;
