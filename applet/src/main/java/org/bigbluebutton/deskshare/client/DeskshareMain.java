@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class DeskshareMain implements ClientListener, LifeLineListener {
+public class DeskshareMain implements ClientListener {
 	private final BlockingQueue<ExitCode> exitReasonQ = new LinkedBlockingQueue<ExitCode>(5);
 	
 	private List<String> optionHelpStrings = new ArrayList<String>();
@@ -149,7 +149,6 @@ public class DeskshareMain implements ClientListener, LifeLineListener {
 		queueExitCode(reason);
 	}
 
-	@Override
 	public void disconnected(ExitCode reason) {
 		queueExitCode(reason);		
 	}

@@ -45,7 +45,6 @@ public class FlvFileWriter {
 	}
 	
     public void writeDataToFile (ByteArrayOutputStream videoData) {
-
     		int size = videoData.size();
             byte[] blockData = videoData.toByteArray();
             

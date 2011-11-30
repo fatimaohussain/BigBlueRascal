@@ -24,19 +24,11 @@ package org.bigbluebutton.deskshare.client.blocks;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
-//import org.bigbluebutton.deskshare.processor.PBlockManager;
-
-import org.bigbluebutton.deskshare.client.FileScreenCaptureSender;
+import org.bigbluebutton.deskshare.client.FlvFileRecorder;
 import org.bigbluebutton.deskshare.common.Dimension;
-
 import java.io.ByteArrayOutputStream;
-//import java.awt.Dimension;
-
-import java.util.concurrent.ConcurrentHashMap;
-//import org.bigbluebutton.deskshare.common.ScreenVideoEncoder;
 import org.bigbluebutton.deskshare.common.ScreenVideoEncoder;
-import org.bigbluebutton.deskshare.common.Dimension;
+//import org.bigbluebutton.deskshare.common.Dimension;
 
 public class BlockManager {
     private final Map<Integer, Block> blocksMap;
@@ -44,29 +36,26 @@ public class BlockManager {
     private int numRows;
     
     private BlockFactory factory;
-    //private PBlockManager blockProcessor;
     private Dimension screenDim, blockDim;
     private int frameCount = 0;
     
-    private FileScreenCaptureSender fileCapture;
+    private FlvFileRecorder fileCapture;
     
     public BlockManager() {
     	blocksMap = new HashMap<Integer, Block>();
-        fileCapture = new FileScreenCaptureSender();
+        fileCapture = new FlvFileRecorder();
     }
     
     public void initialize(Dimension screen, Dimension tile) {
     	screenDim = screen;
     	blockDim = tile;
 
-       // blockProcessor = new PBlockManager(screen, tile);
     	factory = new BlockFactory(screen, tile);
 
         try {
             fileCapture.init();
-
         } catch (Exception e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.err.println("FatiledToOpenFile: " + e.getMessage());
         }
         
@@ -100,14 +89,9 @@ public class BlockManager {
     		frameCount = 0;
     	}
     	frameCount ++;
-    	ByteArrayOutputStream screenVideoFrame = generateFrame(keyFrame);
-      
-       try {
-            fileCapture.record(screenVideoFrame);
-        } catch (Exception e) {
-            e.printStackTrace();
-           // System.err.println("FatiledToEncode: " + e.getMessage());
-        }
+
+        fileCapture.record(generateFrame(true));
+
     }
 
     private ByteArrayOutputStream generateFrame(boolean genKeyFrame){
@@ -126,7 +110,7 @@ public class BlockManager {
     	int numberOfBlocks = numRows * numColumns;
     	for (int pos = 1; pos < numberOfBlocks; pos++) {
     		Block block = blocksMap.get(pos);
-    		byte [] encodedBlock = block.encode(genKeyFrame);
+    		byte[] encodedBlock = block.encode(genKeyFrame);
     		screenVideoFrame.write(encodedBlock, 0, encodedBlock.length);
     	}
 
@@ -146,11 +130,11 @@ public class BlockManager {
         return numColumns;
     }
 
-    public Dimension getScreenDim() {
-		return screenDim;
-	}
+//    public Dimension getScreenDim() {
+//		return screenDim;
+//	}
 
-	public Dimension getBlockDim() {
-		return blockDim;
-	}
+//	public Dimension getBlockDim() {
+//		return blockDim;
+//	}
 }

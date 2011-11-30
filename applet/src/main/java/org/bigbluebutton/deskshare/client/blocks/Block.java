@@ -64,12 +64,12 @@ public final class Block {
             System.arraycopy(capturedPixels, 0, pixelsCopy, 0, capturedPixels.length);
 		}
     	
-    	byte [] encodedBlock;
+    	byte[] encodedBlock;
     	if (! checksumSame(capturedPixels) || keyFrame) {
-    		System.out.println("Pixels changed ." + position + " keyframe " + keyFrame);
+//    		System.out.println("Pixels changed ." + position + " keyframe " + keyFrame);
     		encodedBlock = ScreenVideoEncoder.encodePixels(pixelsCopy, getWidth(), getHeight()); 
     	} else {
-    		System.out.println("Pixels unchanged ." + position + " keyframe " + keyFrame);
+//    		System.out.println("Pixels unchanged ." + position + " keyframe " + keyFrame);
     		encodedBlock = ScreenVideoEncoder.encodeBlockUnchanged();
     	}
         	     	

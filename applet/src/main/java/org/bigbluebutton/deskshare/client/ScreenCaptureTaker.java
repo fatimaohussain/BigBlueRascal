@@ -47,8 +47,9 @@ public class ScreenCaptureTaker {
 		long start = System.currentTimeMillis();
 		BufferedImage image = capture.takeSingleSnapshot();
 		long end = System.currentTimeMillis();
-		System.out.println("Capture took " + (end - start) + " millis");
+		
 		notifyListeners(image);
+		System.out.println("Capture took " + (end - start) + " millis");
 	}
 	
 	private void notifyListeners(BufferedImage image) {

@@ -87,7 +87,7 @@ public class ScreenSharerRunner {
 		System.out.println(NAME + "Change system tray icon message");
 		tray.disconnectIconSystemTrayMessage();
 		captureTaker.stop();
-	} // END FUNCTION disconnectSharing
+	}
 	
 	public void stopSharing() {
 		System.out.println(NAME + "Stopping");
