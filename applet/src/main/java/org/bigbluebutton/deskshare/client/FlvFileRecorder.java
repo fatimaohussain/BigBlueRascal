@@ -22,10 +22,6 @@ package org.bigbluebutton.deskshare.client;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import org.bigbluebutton.deskshare.client.encoder.FlvEncodeException;
 import org.bigbluebutton.deskshare.client.encoder.ScreenVideoFlvEncoder;
 
@@ -33,9 +29,6 @@ public class FlvFileRecorder {
 	private FileOutputStream fo;
 	private ScreenVideoFlvEncoder svf ;
 
-	private boolean closed = false;
-	private int frames = 0;
-	
 	public FlvFileRecorder(){
 		svf = new ScreenVideoFlvEncoder();
 	}
@@ -46,8 +39,7 @@ public class FlvFileRecorder {
 			fo.write(svf.encodeHeader());
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
+		}		
 	}
 
 	public void stop()  {
@@ -65,16 +57,8 @@ public class FlvFileRecorder {
 	
 	private void saveToFile(ByteArrayOutputStream videoData) {
 		try {
-//			if (!closed) {
-				fo.write(svf.encodeFlvData(videoData));
-				fo.flush();				
-//			}
-//			frames++;
-//			if (frames == 20) {
-//				closed = true;
-//				stop();
-//			}
-
+			fo.write(svf.encodeFlvData(videoData));
+			fo.flush();				
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (FlvEncodeException e) {

@@ -26,15 +26,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
 import org.bigbluebutton.deskshare.client.FlvFileRecorder;
 import org.bigbluebutton.deskshare.common.Dimension;
 import java.io.ByteArrayOutputStream;
 import org.bigbluebutton.deskshare.common.ScreenVideoEncoder;
-//import org.bigbluebutton.deskshare.common.Dimension;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+
 
 public class BlockManager {
 	private final Executor exec = Executors.newSingleThreadExecutor();
@@ -60,6 +56,7 @@ public class BlockManager {
     	screenDim = screen;
     	blockDim = tile;
 
+    	/** Initialize the recorder **/
     	try {
             fileCapture.init();
         } catch (Exception e) {
@@ -67,8 +64,8 @@ public class BlockManager {
             System.err.println("FatiledToOpenFile: " + e.getMessage());
         }
         
+        /** Initialize the blocks for this screen capture **/
     	factory = new BlockFactory(screen, tile);
-       
         numColumns = factory.getColumnCount();
         numRows = factory.getRowCount();
         int numberOfBlocks = numColumns * numRows;
@@ -78,11 +75,8 @@ public class BlockManager {
         	blocksMap.put(new Integer(position), block);
         }
         
-
-        
-        
+        /** Start the recorder */
         sendCapturedScreen = true;
-
 		capturedScreenSender = new Runnable() {
 			public void run() {
 				while (sendCapturedScreen) {
@@ -97,24 +91,12 @@ public class BlockManager {
 			}
 		};
 		exec.execute(capturedScreenSender);
-		
-
     }
     
     int count = 0;
     
     public void processCapturedScreen(BufferedImage capturedScreen) {    	
-    	long start = System.currentTimeMillis();
-/*
-    	count++;
-    	File outputfile = new File("D://temp/saved" + count + ".png");
-        try {
-			ImageIO.write(capturedScreen, "png", outputfile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-*/		
+    	long start = System.currentTimeMillis();	
 		int numberOfBlocks = numColumns * numRows;
 		for (int position = 1; position <= numberOfBlocks; position++) {
 			Block block = blocksMap.get(new Integer(position));
@@ -124,6 +106,7 @@ public class BlockManager {
 
 
     private void saveFrameToFile() {
+    	/** Generate a key frame every 15th frame **/
     	boolean keyFrame = false;
     	if (frameCount % 15 == 0) {
     		keyFrame = true;
@@ -138,9 +121,7 @@ public class BlockManager {
     private ByteArrayOutputStream generateFrame(boolean genKeyFrame){
     	ByteArrayOutputStream screenVideoFrame = new ByteArrayOutputStream();
     	byte[] encodedDim = ScreenVideoEncoder.encodeBlockAndScreenDimensions(blockDim.getWidth(), screenDim.getWidth(), blockDim.getHeight(), screenDim.getHeight());
-
     	byte videoDataHeader = ScreenVideoEncoder.encodeFlvVideoDataHeader(genKeyFrame);
-
     	screenVideoFrame.write(videoDataHeader);
     	screenVideoFrame.write(encodedDim, 0, encodedDim.length);
        
@@ -166,12 +147,4 @@ public class BlockManager {
     public int getColumnCount() {
         return numColumns;
     }
-
-//    public Dimension getScreenDim() {
-//		return screenDim;
-//	}
-
-//	public Dimension getBlockDim() {
-//		return blockDim;
-//	}
 }
