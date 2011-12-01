@@ -54,8 +54,9 @@ public final class ScreenVideoFlvEncoder {
     }
     
     public byte[] encodeFlvData (ByteArrayOutputStream screenVideoData) throws FlvEncodeException {
-        byte[] blockData = screenVideoData.toByteArray();
-
+      //  byte[] blockData = new byte[screenVideoData.length];
+      //  System.arraycopy(screenVideoData, 0, blockData, 0, blockData.length);
+    	byte[] blockData = screenVideoData.toByteArray();
         byte[] flvData;
 		try {
 			flvData = encodeFlvTag(blockData);

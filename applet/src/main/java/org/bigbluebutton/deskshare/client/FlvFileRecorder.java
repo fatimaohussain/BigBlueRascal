@@ -33,13 +33,16 @@ public class FlvFileRecorder {
 	private FileOutputStream fo;
 	private ScreenVideoFlvEncoder svf ;
 
+	private boolean closed = false;
+	private int frames = 0;
+	
 	public FlvFileRecorder(){
 		svf = new ScreenVideoFlvEncoder();
 	}
 	
 	public void init() {
     	try {
-    		fo = new FileOutputStream("D://temp/" + "ScreenVideo3.flv");
+    		fo = new FileOutputStream("D://temp/" + "ScreenVideo4.flv");
 			fo.write(svf.encodeHeader());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -62,8 +65,16 @@ public class FlvFileRecorder {
 	
 	private void saveToFile(ByteArrayOutputStream videoData) {
 		try {
-			fo.write(svf.encodeFlvData(videoData));
-			fo.flush();
+//			if (!closed) {
+				fo.write(svf.encodeFlvData(videoData));
+				fo.flush();				
+//			}
+//			frames++;
+//			if (frames == 20) {
+//				closed = true;
+//				stop();
+//			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (FlvEncodeException e) {

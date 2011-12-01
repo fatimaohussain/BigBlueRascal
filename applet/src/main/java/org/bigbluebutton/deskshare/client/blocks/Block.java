@@ -23,11 +23,20 @@ package org.bigbluebutton.deskshare.client.blocks;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.imageio.ImageIO;
+
 import org.bigbluebutton.deskshare.common.PixelExtractException;
 import org.bigbluebutton.deskshare.common.ScreenVideoEncoder;
 import org.bigbluebutton.deskshare.common.Dimension;
+
+
 
 public final class Block {   
 	Random random = new Random();
@@ -49,17 +58,27 @@ public final class Block {
         int length = dim.getWidth() * dim.getHeight();
 		capturedPixels = new int[length];
 		for (int i = 0; i < length; i++) {
-			capturedPixels[i] = 0xFFFF;
+			capturedPixels[i] = 0xFF00;
 		}
     }
     
     public void processBlock(BufferedImage capturedScreen) {	     	
     	synchronized(pixelsLock) {
             try {
-            	capturedPixels = ScreenVideoEncoder.getPixels(capturedScreen, getX(), getY(), getWidth(), getHeight());         	            	                
+            	capturedPixels = ScreenVideoEncoder.getPixels(capturedScreen, getX(), getY(), getWidth(), getHeight()); 
+            	
+//            	BufferedImage bimg = new BufferedImage(getWidth(),getHeight(),BufferedImage.TYPE_INT_RGB);
+////            	bimg.setRGB(0,0,getWidth(),getHeight(),capturedPixels,0,getWidth());
+
+///            	File outputfile = new File("D://temp/block" + position + ".png");
+//              ImageIO.write(bimg, "png", outputfile);
+///            	
             } catch (PixelExtractException e) {
             	System.out.println(e.toString());
-        	}  
+        	} //catch (IOException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}  
     	}
     }
        

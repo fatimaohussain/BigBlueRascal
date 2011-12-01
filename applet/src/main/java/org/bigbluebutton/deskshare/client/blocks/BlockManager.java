@@ -60,15 +60,15 @@ public class BlockManager {
     	screenDim = screen;
     	blockDim = tile;
 
-    	factory = new BlockFactory(screen, tile);
-
-        try {
+    	try {
             fileCapture.init();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("FatiledToOpenFile: " + e.getMessage());
         }
         
+    	factory = new BlockFactory(screen, tile);
+       
         numColumns = factory.getColumnCount();
         numRows = factory.getRowCount();
         int numberOfBlocks = numColumns * numRows;
@@ -78,7 +78,10 @@ public class BlockManager {
         	blocksMap.put(new Integer(position), block);
         }
         
-		sendCapturedScreen = true;
+
+        
+        
+        sendCapturedScreen = true;
 
 		capturedScreenSender = new Runnable() {
 			public void run() {
@@ -94,13 +97,15 @@ public class BlockManager {
 			}
 		};
 		exec.execute(capturedScreenSender);
+		
+
     }
     
     int count = 0;
     
     public void processCapturedScreen(BufferedImage capturedScreen) {    	
     	long start = System.currentTimeMillis();
-
+/*
     	count++;
     	File outputfile = new File("D://temp/saved" + count + ".png");
         try {
@@ -109,7 +114,7 @@ public class BlockManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+*/		
 		int numberOfBlocks = numColumns * numRows;
 		for (int position = 1; position <= numberOfBlocks; position++) {
 			Block block = blocksMap.get(new Integer(position));
@@ -120,9 +125,9 @@ public class BlockManager {
 
     private void saveFrameToFile() {
     	boolean keyFrame = false;
-    	if (frameCount == 0) {
+    	if (frameCount % 15 == 0) {
     		keyFrame = true;
-    	//	frameCount = 0;
+    		frameCount = 0;
     	}
     	frameCount ++;
 
@@ -132,20 +137,16 @@ public class BlockManager {
 
     private ByteArrayOutputStream generateFrame(boolean genKeyFrame){
     	ByteArrayOutputStream screenVideoFrame = new ByteArrayOutputStream();
-    	byte [] encodedDim = ScreenVideoEncoder.encodeBlockAndScreenDimensions(blockDim.getWidth(), screenDim.getWidth(), blockDim.getHeight(), screenDim.getHeight());
+    	byte[] encodedDim = ScreenVideoEncoder.encodeBlockAndScreenDimensions(blockDim.getWidth(), screenDim.getWidth(), blockDim.getHeight(), screenDim.getHeight());
 
     	byte videoDataHeader = ScreenVideoEncoder.encodeFlvVideoDataHeader(genKeyFrame);
 
     	screenVideoFrame.write(videoDataHeader);
-    	try {
-    		screenVideoFrame.write(encodedDim);
-    	} catch (Exception e) {
-    		System.out.println("An IO exception occured");
-    	}
-        
+    	screenVideoFrame.write(encodedDim, 0, encodedDim.length);
+       
     	int numberOfBlocks = numRows * numColumns;
-    	for (int pos = 1; pos < numberOfBlocks; pos++) {
-    		Block block = blocksMap.get(pos);
+    	for (int pos = 1; pos <= numberOfBlocks; pos++) {
+    		Block block = blocksMap.get(new Integer(pos));
     		byte[] encodedBlock = block.encode(genKeyFrame);
     		screenVideoFrame.write(encodedBlock, 0, encodedBlock.length);
     	}
