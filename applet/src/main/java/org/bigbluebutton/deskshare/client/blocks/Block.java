@@ -45,6 +45,12 @@ public final class Block {
         this.dim = dim;
         this.position = position;
         this.location = location;
+        
+        int length = dim.getWidth() * dim.getHeight();
+		capturedPixels = new int[length];
+		for (int i = 0; i < length; i++) {
+			capturedPixels[i] = 0xFFFF;
+		}
     }
     
     public void processBlock(BufferedImage capturedScreen) {	     	
@@ -59,19 +65,18 @@ public final class Block {
        
     public byte[] encode(boolean keyFrame) {   
     	int[] pixelsCopy = new int[capturedPixels.length];
-    	
+    	byte[] encodedBlock;
     	synchronized (pixelsLock) {     		
             System.arraycopy(capturedPixels, 0, pixelsCopy, 0, capturedPixels.length);
+	    	
+	    	if (! checksumSame(capturedPixels) || keyFrame) {
+//	    		System.out.println("Pixels changed ." + position + " keyframe " + keyFrame);
+	    		encodedBlock = ScreenVideoEncoder.encodePixels(pixelsCopy, getWidth(), getHeight()); 
+	    	} else {
+//	    		System.out.println("Pixels unchanged ." + position + " keyframe " + keyFrame);
+	    		encodedBlock = ScreenVideoEncoder.encodeBlockUnchanged();
+	    	}
 		}
-    	
-    	byte[] encodedBlock;
-    	if (! checksumSame(capturedPixels) || keyFrame) {
-//    		System.out.println("Pixels changed ." + position + " keyframe " + keyFrame);
-    		encodedBlock = ScreenVideoEncoder.encodePixels(pixelsCopy, getWidth(), getHeight()); 
-    	} else {
-//    		System.out.println("Pixels unchanged ." + position + " keyframe " + keyFrame);
-    		encodedBlock = ScreenVideoEncoder.encodeBlockUnchanged();
-    	}
         	     	
         return encodedBlock;
     }

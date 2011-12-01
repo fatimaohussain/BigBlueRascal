@@ -173,6 +173,10 @@ public final class ScreenVideoEncoder {
 			byte green = (byte) ((pixels[i] >> 8) & 0xff);
 			byte blue = (byte) (pixels[i] & 0xff);
 
+//			byte red = (byte) (0xff);
+//			byte green = (byte) (0x0);
+//			byte blue = (byte) (0x0);
+			
 			// Sequence should be BGR
 			rgbPixels[position++] = blue;
 			rgbPixels[position++] = green;
